@@ -104,11 +104,51 @@ $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Respons
     $location->user_id = 0;
     $location->save();
     return $response
-        ->withStatus(400)
+        ->withStatus(200)
         ->withJson([
             'Status' => 'Okay',
             'Location' => $location->__toPublicArray(),
         ]);
+});
+
+$app->post("/location", function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
+    $sessionKey = $request->getParsedBodyParam('sessionKey');
+    if(!$sessionKey){
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => 'No sessionKey'
+            ]);
+    }
+    if($sessionKey != str_rot13($secret)){
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => 'Invalid sessionKey'
+            ]);
+    }
+    $location = \Longitude\Models\Location::search()
+        ->where('user_id', 0)
+        ->order('created', 'DESC')
+        ->execOne();
+    if($location) {
+        return $response
+            ->withStatus(200)
+            ->withJson([
+                'Status' => 'Okay',
+                'Location' => $location->__toPublicArray(),
+            ]);
+    }else{
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => "No locations sent yet!"
+            ]);
+
+    }
 });
 
 $app->post('/friends', function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
