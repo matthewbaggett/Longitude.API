@@ -72,7 +72,7 @@ $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Respons
                 'Reason' => 'No sessionKey'
             ]);
     }
-    if(!$sessionKey != str_rot13($secret)){
+    if($sessionKey != str_rot13($secret)){
         return $response
             ->withStatus(400)
             ->withJson([
