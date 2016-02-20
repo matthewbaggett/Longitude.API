@@ -60,6 +60,57 @@ $app->post('/auth', function(\Slim\Http\Request $request, \Slim\Http\Response $r
     }
 });
 
+$app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
+    $sessionKey = $request->getParsedBodyParam('sessionKey');
+    $coordinates = $request->getParsedBodyParam('location');
+
+    if(!$sessionKey){
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => 'No sessionKey'
+            ]);
+    }
+    if(!$sessionKey != str_rot13($secret)){
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => 'Invalid sessionKey'
+            ]);
+    }
+    if(!$coordinates){
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => 'No location'
+            ]);
+    }
+    $coordinates = explode(",", $coordinates);
+    if(!count($coordinates) == 2){
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => 'location value invalid'
+            ]);
+    }
+
+    $location = new \Longitude\Models\Location();
+    $location->lat = $coordinates[0];
+    $location->lng = $coordinates[1];
+    $location->user_id = 0;
+    $location->save();
+    return $response
+        ->withStatus(400)
+        ->withJson([
+            'Status' => 'Okay',
+            'Location' => $location->__toPublicArray(),
+        ]);
+});
+
 $app->post('/friends', function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
 
     $faker = Faker\Factory::create();
