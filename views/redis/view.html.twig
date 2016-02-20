@@ -1,0 +1,41 @@
+{% extends "base.html.twig" %}
+{% block content %}
+    <h1>Redis Viewer</h1>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Data</h2>
+            <table class="table-condensed table-hover table-striped" id="redis-data">
+                <thead>
+                <tr>
+                    <td>Key</td>
+                    <td>Value</td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for key in redisKeys %}
+                    <tr rediskey="{{ key.key|replace({':': '', '.': ''}) }}">
+                        <td class="key">{{ key.key }}</td>
+                        <td class="value">{{ key.value }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-12">
+            <h2>Events</h2>
+            <form id="redis-events-shown">
+
+            </form>
+            <table class="table-condensed table-hover table-striped" id="redis-events">
+                <thead>
+                <tr>
+                    <td>Event Name</td>
+                    <td>Payload</td>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

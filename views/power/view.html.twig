@@ -1,0 +1,74 @@
+{% extends "base.html.twig" %}
+{% block content %}
+    <h1>Power Consumption</h1>
+    <div class="row">
+        <div class="col-md-12">
+            <div id="chart-power-consumption" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+            <script>
+                $(function () {
+                    $('#chart-power-consumption').highcharts({
+                        chart: {
+                            type: 'areaspline'
+                        },
+                        title: {
+                            text: 'Power Consumption for the last 30 days'
+                        },
+                        subtitle: {
+                            text: '{{ average_watts }} watts average. Showing {{ count_datapoints }} datapoints'
+                        },
+                        xAxis: {
+                            type: 'datetime',
+                            dateTimeLabelFormats: { // don't display the dummy year
+                                millisecond: '%H:%M:%S.%L',
+                                second: '%H:%M:%S',
+                                minute: '%H:%M',
+                                hour: '%H:%M',
+                                day: '%e. %b',
+                                week: '%e. %b',
+                                month: '%b \'%y',
+                                year: '%Y'
+                            },
+                            title: {
+                                text: 'Date'
+                            }
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'Watts'
+                            },
+                            //min: 0
+                        },
+                        credits: {
+                            enabled: false
+                        },
+                        tooltip: {
+                            headerFormat: '<b>{series.name}</b><br>',
+                            pointFormat: '{point.x:%Y/%m/%d %H:%M:%S}: <b>{point.y:.0f} watts</b>'
+                        },
+
+                        plotOptions: {
+                            areaspline: {
+                                marker: {
+                                    enabled: false
+                                },
+                                fillOpacity: 0.5
+                            }
+                        },
+
+                        series: [{
+                            name: 'Month use in Watts',
+                            // Define the data points. All series have a dummy year
+                            // of 1970/71 in order to be compared on the same x axis. Note
+                            // that in JavaScript, months start at 0 for January, 1 for February etc.
+                            data: [
+                                {% for powerConsumption in powerConsumptionRecords %}
+                                [Date.UTC({{ powerConsumption.created|date("Y") }}, {{ powerConsumption.created|date("m") }}, {{ powerConsumption.created|date("d") }}, {{ powerConsumption.created|date("H") }}, {{ powerConsumption.created|date("i") }}, {{ powerConsumption.created|date("s") }}), {{ powerConsumption.watts }}],
+                                {% endfor %}
+                            ]
+                        }]
+                    });
+                });
+            </script>
+        </div>
+    </div>
+{% endblock %}
