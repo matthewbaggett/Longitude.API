@@ -1,7 +1,7 @@
 <?php
 require('vendor/autoload.php');
 require('config/env.php');
-#require('config/mysql.php');
+require('config/mysql.php');
 #require('config/redis.php');
 
 // Create Slim app
