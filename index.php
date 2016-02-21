@@ -57,6 +57,14 @@ $app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $
                 'Reason' => 'Need to have email OR phone number'
             ]);
     }
+    if($password){
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => 'Need to have password'
+            ]);
+    }
     $user = User::search()
         ->where('email', $email)
         ->execOne();
