@@ -24,7 +24,16 @@ if(isset($environment['MYSQL_PORT'])) {
         'db_password' => "q05x2q8LtAg7O8Q",
         'db_database' => "longitude",
     );
+}elseif(gethostname() == 'LincolnTux'){
+    $databaseConfiguration = array(
+        'db_type' => 'Mysql',
+        'db_hostname' => "localhost",
+        'db_port' => 3306,
+        'db_username' => "longitude",
+        'db_password' => "q05x2q8LtAg7O8Q",
+        'db_database' => "longitude",
+    );
 }else{
-    die("No DB config");
+    die("No DB config for " . gethostname() . ".");
 }
 $database = new \Thru\ActiveRecord\DatabaseLayer($databaseConfiguration);

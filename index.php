@@ -126,6 +126,10 @@ $app->post('/auth', function(\Slim\Http\Request $request, \Slim\Http\Response $r
     }
 });
 
+$app->put("/profile",  function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
+    $sessionKey = $request->getParsedBodyParam('sessionKey');
+});
+
 $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
     $sessionKey = $request->getParsedBodyParam('sessionKey');
     $coordinates = $request->getParsedBodyParam('location');
