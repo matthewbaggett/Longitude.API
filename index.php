@@ -45,10 +45,18 @@ $app->get('/', function (\Slim\Http\Request $request, \Slim\Http\Response $respo
 });
 
 $app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
-    $email = $request->getParsedBodyParam('email');
-    $phonenumber = $request->getParsedBodyParam('phonenumber');
+    $email = $request->getParsedBodyParam('email', '');
+    $phonenumber = $request->getParsedBodyParam('phonenumber', '');
     $password = $request->getParsedBodyParam('password');
 
+    if(!$email && !$phonenumber){
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => 'Need to have email OR phone number'
+            ]);
+    }
     $user = User::search()
         ->where('email', $email)
         ->execOne();
