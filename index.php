@@ -4,6 +4,9 @@ require('config/env.php');
 require('config/mysql.php');
 #require('config/redis.php');
 
+use Longitude\Models\User;
+use Longitude\Models\Location;
+
 // Create Slim app
 $app = new \Slim\App(
     [
@@ -39,6 +42,53 @@ $secret = 'fUKcwDBTmYoY71z';
 
 $app->get('/', function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
     die("Nope");
+});
+
+$app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
+    $email = $request->getParsedBodyParam('email');
+    $phonenumber = $request->getParsedBodyParam('phonenumber');
+    $password = $request->getParsedBodyParam('password');
+
+    $user = User::search()
+        ->where('email', $email)
+        ->execOne();
+    if(!$user){
+        $user = User::search()
+            ->where('phonenumber', $phonenumber)
+            ->execOne();
+    }
+    if(!$user instanceof User){
+        $user = new User();
+        $user->email = $email;
+        $user->phonenumber = $phonenumber;
+        $user->setPassword($password);
+        $user->save();
+    }
+    if($user->banned == "Yes" || $user->deleted == "Yes"){
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => 'User Banned/Deleted'
+            ]);
+    }
+    if($user->checkPassword($password)){
+        return $response
+            ->withStatus(200)
+            ->withJson([
+                'Status' => 'Okay',
+                'User' => $user->__toPublicArray(),
+                'AuthCode' => $user->getNextAuthCode(),
+            ]);
+    }else{
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => 'Bad Credentials'
+            ]);
+    }
+
 });
 
 $app->post('/auth', function(\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
