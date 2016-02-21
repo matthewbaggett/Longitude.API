@@ -57,7 +57,7 @@ $app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $
                 'Reason' => 'Need to have email OR phone number'
             ]);
     }
-    if($password){
+    if(!$password){
         return $response
             ->withStatus(400)
             ->withJson([
