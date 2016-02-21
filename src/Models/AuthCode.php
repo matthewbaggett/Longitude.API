@@ -20,16 +20,11 @@ class AuthCode extends ActiveRecord
     public $auth_code;
     public $created;
 
-    public function postConstruct()
+    public function save($automatic_reload = true)
     {
-        parent::postConstruct();
         if(!$this->auth_code){
             $this->auth_code = UUID::v4();
         }
-    }
-
-    public function save($automatic_reload = true)
-    {
         if (!$this->created) {
             $this->created = date("Y-m-d H:i:s");
         }
