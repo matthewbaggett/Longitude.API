@@ -103,7 +103,12 @@ class User extends ActiveRecord
     public function __toPublicArray()
     {
         $array = parent::__toPublicArray();
-        unset($array['password'], $array['deleted'], $array['banned']);
+        unset(
+            $array['user_id'],
+            $array['password'],
+            $array['deleted'],
+            $array['banned']
+        );
         return $array;
     }
 }
