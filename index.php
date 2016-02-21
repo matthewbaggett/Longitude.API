@@ -49,7 +49,7 @@ $app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $
     $phonenumber = $request->getParsedBodyParam('phonenumber', '');
     $password = $request->getParsedBodyParam('password');
 
-    if(!$email && !$phonenumber){
+    if(!($email || $phonenumber)){
         return $response
             ->withStatus(400)
             ->withJson([
