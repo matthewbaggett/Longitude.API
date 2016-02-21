@@ -99,4 +99,11 @@ class User extends ActiveRecord
         $authCode->save();
         return $authCode;
     }
+
+    public function __toPublicArray()
+    {
+        $array = parent::__toPublicArray();
+        unset($array['password'], $array['deleted'], $array['banned']);
+        return $array;
+    }
 }
