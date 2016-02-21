@@ -108,6 +108,7 @@ $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Respons
         ->withJson([
             'Status' => 'Okay',
             'Location' => $location->__toPublicArray(),
+            'SentLocation' => implode(",", $coordinates)
         ]);
 });
 
