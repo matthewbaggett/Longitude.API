@@ -39,7 +39,7 @@ class AuthCode extends ActiveRecord
      */
     public function getUser(){
         if(!$this->_user) {
-            $this->_user = User::search()->where('user_id', $this->user_id);
+            $this->_user = User::search()->where('user_id', $this->user_id)->execOne();
         }
         return $this->_user;
     }

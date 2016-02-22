@@ -149,7 +149,7 @@ $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Respons
             ->withStatus(400)
             ->withJson([
                 'Status' => 'Failure',
-                'Reason' => 'No sessionKey'
+                'Reason' => 'No authKey'
             ]);
     }
 
