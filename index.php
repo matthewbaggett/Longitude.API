@@ -125,7 +125,7 @@ $app->post('/auth', function(\Slim\Http\Request $request, \Slim\Http\Response $r
             ->withStatus(200)
             ->withJson([
                 'Status' => 'Okay',
-                'SessionKey' => str_rot13($authCode),
+                'authKey' => str_rot13($authCode),
             ]);
     }else{
         return $response
@@ -137,7 +137,7 @@ $app->post('/auth', function(\Slim\Http\Request $request, \Slim\Http\Response $r
 });
 
 $app->put("/profile",  function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
-    $sessionKey = $request->getParsedBodyParam('sessionKey');
+    $authKey = $request->getParsedBodyParam('authKey');
 });
 
 $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
@@ -198,21 +198,21 @@ $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Respons
 });
 
 $app->post("/location", function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
-    $sessionKey = $request->getParsedBodyParam('sessionKey');
-    if(!$sessionKey){
+    $authKey = $request->getParsedBodyParam('authKey');
+    if(!$authKey){
         return $response
             ->withStatus(400)
             ->withJson([
                 'Status' => 'Failure',
-                'Reason' => 'No sessionKey'
+                'Reason' => 'No authKey'
             ]);
     }
-    if($sessionKey != str_rot13($secret)){
+    if($authKey != str_rot13($secret)){
         return $response
             ->withStatus(400)
             ->withJson([
                 'Status' => 'Failure',
-                'Reason' => 'Invalid sessionKey'
+                'Reason' => 'Invalid authKey'
             ]);
     }
     $location = \Longitude\Models\Location::search()
@@ -241,7 +241,7 @@ $app->post('/friends', function (\Slim\Http\Request $request, \Slim\Http\Respons
 
     $faker = Faker\Factory::create();
 
-    $sessionKey = $request->getParsedBodyParam('sessionKey');
+    $authKey = $request->getParsedBodyParam('authKey');
 
     $friends = [];
     $friendCount = rand(5,10);
@@ -262,7 +262,7 @@ $app->post('/friends', function (\Slim\Http\Request $request, \Slim\Http\Respons
         $friends[] = $friend;
     }
 
-    if($sessionKey == str_rot13($secret)){
+    if($authKey == str_rot13($secret)){
         return $response
             ->withStatus(200)
             ->withJson([
