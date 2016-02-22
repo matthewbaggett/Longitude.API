@@ -37,6 +37,8 @@ class User extends ActiveRecord
     public $created;
     public $updated;
 
+    private $_last_location;
+
     public function isAdmin()
     {
         if ($this->type == 'Admin') {
@@ -118,5 +120,15 @@ class User extends ActiveRecord
             return $authCode->getUser();
         }
         return null;
+    }
+
+    public function getLocation(){
+        if(!$this->_last_location){
+            $this->_last_location = Location::search()
+                ->where('user_id', $this->user_id)
+                ->order('created', 'DESC')
+                ->execOne();
+        }
+        return $this->_last_location;
     }
 }

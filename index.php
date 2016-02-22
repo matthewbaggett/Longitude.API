@@ -252,6 +252,19 @@ $app->post('/friends', function (\Slim\Http\Request $request, \Slim\Http\Respons
         $locationBoxYMin = -2.418099;
         $locationBoxYMax = -2.064232;
 
+        foreach(User::search()->exec() as $user){
+            $lastLocation = $user->getLocation();
+            if($lastLocation instanceof Location) {
+                $friends[] = [
+                    'Name' => ['Firstname' => $user->firstName, 'Lastname' => $user->lastName],
+                    'Location' => [
+                        'Lat' => $lastLocation->lat,
+                        'Long' => $lastLocation->lng,
+                    ]
+                ];
+            }
+        }
+
         for ($i = 0; $i < $friendCount; $i++) {
             $friend = [
                 'Name' => ['Firstname' => $faker->firstName, 'Lastname' => $faker->lastName],
