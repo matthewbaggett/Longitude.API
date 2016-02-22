@@ -48,7 +48,6 @@ $app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $
     $email = $request->getParsedBodyParam('email', '');
     $phonenumber = $request->getParsedBodyParam('phonenumber', '');
     $password = $request->getParsedBodyParam('password');
-
     if(!($email || $phonenumber)){
         return $response
             ->withStatus(400)
@@ -65,13 +64,24 @@ $app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $
                 'Reason' => 'Need to have password'
             ]);
     }
-    $user = User::search()
-        ->where('email', $email)
-        ->execOne();
-    if(!$user){
-        $user = User::search()
-            ->where('phonenumber', $phonenumber)
-            ->execOne();
+    $userSearch = User::search();
+    $searchValid = false;
+    if(!empty($email)){
+        $userSearch->where('email', $email);
+        $searchValid = true;
+    }
+    if(!empty($phonenumber)){
+        $userSearch->where('phonenumber', $phonenumber);
+        $searchValid = true;
+    }
+    $user = $userSearch->execOne();
+    if(!$searchValid){
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => 'User Lookup Invalid'
+            ]);
     }
     if(!$user instanceof User){
         $user = new User();
