@@ -20,6 +20,8 @@ class AuthCode extends ActiveRecord
     public $auth_code;
     public $created;
 
+    private $_user;
+
     public function save($automatic_reload = true)
     {
         if(!$this->auth_code){
@@ -29,5 +31,16 @@ class AuthCode extends ActiveRecord
             $this->created = date("Y-m-d H:i:s");
         }
         parent::save($automatic_reload);
+    }
+
+    /**
+     * @return $this
+     * @throws \Thru\ActiveRecord\Exception
+     */
+    public function getUser(){
+        if(!$this->_user) {
+            $this->_user = User::search()->where('user_id', $this->user_id);
+        }
+        return $this->_user;
     }
 }

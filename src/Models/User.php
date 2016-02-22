@@ -111,4 +111,12 @@ class User extends ActiveRecord
         );
         return $array;
     }
+
+    public static function getByAuthCode($authCode){
+        $authCode = AuthCode::search()->where('auth_code', $authCode)->execOne();
+        if($authCode instanceof AuthCode){
+            return $authCode->getUser();
+        }
+        return null;
+    }
 }

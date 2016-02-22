@@ -131,10 +131,10 @@ $app->put("/profile",  function (\Slim\Http\Request $request, \Slim\Http\Respons
 });
 
 $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
-    $sessionKey = $request->getParsedBodyParam('sessionKey');
+    $authKey = $request->getParsedBodyParam('authKey');
     $coordinates = $request->getParsedBodyParam('location');
 
-    if(!$sessionKey){
+    if(!$authKey){
         return $response
             ->withStatus(400)
             ->withJson([
@@ -142,12 +142,15 @@ $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Respons
                 'Reason' => 'No sessionKey'
             ]);
     }
-    if($sessionKey != str_rot13($secret)){
+
+    $user = User::getByAuthCode($authKey);
+
+    if(!$user instanceof User){
         return $response
             ->withStatus(400)
             ->withJson([
                 'Status' => 'Failure',
-                'Reason' => 'Invalid sessionKey'
+                'Reason' => 'Invalid authKey. No user match.'
             ]);
     }
     if(!$coordinates){
@@ -171,7 +174,7 @@ $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Respons
     $location = new \Longitude\Models\Location();
     $location->lat = $coordinates[0];
     $location->lng = $coordinates[1];
-    $location->user_id = 0;
+    $location->user_id = $user->user_id;
     $location->save();
     return $response
         ->withStatus(200)
