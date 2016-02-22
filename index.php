@@ -242,27 +242,27 @@ $app->post('/friends', function (\Slim\Http\Request $request, \Slim\Http\Respons
     $faker = Faker\Factory::create();
 
     $authKey = $request->getParsedBodyParam('authKey');
+    $user = User::getByAuthCode($authKey);
+    if($user instanceof User) {
+        $friends = [];
+        $friendCount = rand(5, 10);
 
-    $friends = [];
-    $friendCount = rand(5,10);
+        $locationBoxXMin = 53.569503;
+        $locationBoxXMax = 53.392574;
+        $locationBoxYMin = -2.418099;
+        $locationBoxYMax = -2.064232;
 
-    $locationBoxXMin = 53.569503;
-    $locationBoxXMax = 53.392574;
-    $locationBoxYMin = -2.418099;
-    $locationBoxYMax = -2.064232;
+        for ($i = 0; $i < $friendCount; $i++) {
+            $friend = [
+                'Name' => ['Firstname' => $faker->firstName, 'Lastname' => $faker->lastName],
+                'Location' => [
+                    'Lat' => rand($locationBoxXMin * 1000000, $locationBoxXMax * 1000000) / 1000000,
+                    'Long' => rand($locationBoxYMin * 1000000, $locationBoxYMax * 1000000) / 1000000
+                ]
+            ];
+            $friends[] = $friend;
+        }
 
-    for($i = 0; $i < $friendCount; $i++){
-        $friend = [
-            'Name' => ['Firstname' => $faker->firstName, 'Lastname' => $faker->lastName],
-            'Location' => [
-                'Lat' => rand($locationBoxXMin*1000000, $locationBoxXMax*1000000)/1000000,
-                'Long' => rand($locationBoxYMin*1000000, $locationBoxYMax*1000000)/1000000
-            ]
-        ];
-        $friends[] = $friend;
-    }
-
-    if($authKey == str_rot13($secret)){
         return $response
             ->withStatus(200)
             ->withJson([
@@ -274,9 +274,10 @@ $app->post('/friends', function (\Slim\Http\Request $request, \Slim\Http\Respons
             ->withStatus(400)
             ->withJson([
                 'Status' => 'Failure',
+                'Reason' => "User not found for key"
             ]);
     }
-})->setName('redis');
+})->setName('friends_list');
 
 // Run app
 $app->run();
