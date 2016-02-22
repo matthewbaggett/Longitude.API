@@ -138,6 +138,34 @@ $app->post('/auth', function(\Slim\Http\Request $request, \Slim\Http\Response $r
 
 $app->put("/profile",  function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
     $authKey = $request->getParsedBodyParam('authKey');
+    if(!$authKey){
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => 'No authKey'
+            ]);
+    }
+
+    $user = User::getByAuthCode($authKey);
+    if(!$user instanceof User){
+        return $response
+            ->withStatus(400)
+            ->withJson([
+                'Status' => 'Failure',
+                'Reason' => 'Invalid authKey. No user match.'
+            ]);
+    }
+
+    if($request->getParsedBodyParam('phoneNumber')){
+        $user->phonenumber = $request->getParsedBodyParam('phoneNumber');
+    }
+
+    return $response
+        ->withStatus(200)
+        ->withJson([
+            'Status' => 'Okay',
+        ]);
 });
 
 $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
