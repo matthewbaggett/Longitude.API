@@ -143,6 +143,7 @@ $app->put("/profile",  function (\Slim\Http\Request $request, \Slim\Http\Respons
 $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
     $authKey = $request->getParsedBodyParam('authKey');
     $coordinates = $request->getParsedBodyParam('location');
+    $deviceId = $request->getParsedBodyParam('deviceId', '');
 
     if(!$authKey){
         return $response
@@ -185,6 +186,7 @@ $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Respons
     $location->lat = $coordinates[0];
     $location->lng = $coordinates[1];
     $location->user_id = $user->user_id;
+    $location->device = $deviceId;
     $location->save();
     return $response
         ->withStatus(200)

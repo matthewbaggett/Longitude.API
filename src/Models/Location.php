@@ -10,6 +10,7 @@ use \Thru\ActiveRecord\ActiveRecord;
  * @var $user_id INTEGER
  * @var $lat DOUBLE(12,6)
  * @var $lng DOUBLE(12,6)
+ * @var $device STRING
  * @var $created DATETIME
  */
 class Location extends ActiveRecord
@@ -19,6 +20,7 @@ class Location extends ActiveRecord
     public $user_id;
     public $lat;
     public $lng;
+    public $device;
     public $created;
 
     public function save($automatic_reload = true)
