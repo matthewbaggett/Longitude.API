@@ -160,6 +160,7 @@ $app->put("/profile",  function (\Slim\Http\Request $request, \Slim\Http\Respons
     if($request->getParsedBodyParam('phoneNumber')){
         $user->phonenumber = $request->getParsedBodyParam('phoneNumber');
     }
+    $user->save();
 
     return $response
         ->withStatus(200)
