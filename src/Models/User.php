@@ -11,6 +11,8 @@ use Thru\UUID;
  * @var $user_uuid UUID
  * @var $username STRING
  * @var $displayname STRING
+ * @var $firstname STRING
+ * @var $lastname STRING
  * @var $phonenumber STRING
  * @var $password STRING(60)
  * @var $email STRING(320)
@@ -28,6 +30,8 @@ class User extends ActiveRecord
     public $user_uuid;
     public $username = '';
     public $displayname = '';
+    public $firstname = '';
+    public $lastname = '';
     public $phonenumber = '';
     public $password;
     public $email = '';

@@ -256,7 +256,7 @@ $app->post('/friends', function (\Slim\Http\Request $request, \Slim\Http\Respons
             $lastLocation = $user->getLocation();
             if($lastLocation instanceof Location) {
                 $friends[] = [
-                    'Name' => ['Firstname' => $user->firstName, 'Lastname' => $user->lastName],
+                    'Name' => ['Firstname' => $user->email, 'Lastname' => ''],
                     'Location' => [
                         'Lat' => $lastLocation->lat,
                         'Long' => $lastLocation->lng,
