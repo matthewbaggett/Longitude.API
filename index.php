@@ -11,7 +11,7 @@ use Longitude\Models\Location;
 $app = new \Slim\App(
     [
         'settings' => [
-            'debug'         => true,
+            'debug' => true,
         ]
     ]
 );
@@ -44,11 +44,11 @@ $app->get('/', function (\Slim\Http\Request $request, \Slim\Http\Response $respo
     die("Nope");
 });
 
-$app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
+$app->post("/login", function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
     $email = $request->getParsedBodyParam('email', '');
     $phonenumber = $request->getParsedBodyParam('phonenumber', '');
     $password = $request->getParsedBodyParam('password');
-    if(!($email || $phonenumber)){
+    if (!($email || $phonenumber)) {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -56,7 +56,7 @@ $app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $
                 'Reason' => 'Need to have email OR phone number'
             ]);
     }
-    if(!$password){
+    if (!$password) {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -66,16 +66,16 @@ $app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $
     }
     $userSearch = User::search();
     $searchValid = false;
-    if(!empty($email)){
+    if (!empty($email)) {
         $userSearch->where('email', $email);
         $searchValid = true;
     }
-    if(!empty($phonenumber)){
+    if (!empty($phonenumber)) {
         $userSearch->where('phonenumber', $phonenumber);
         $searchValid = true;
     }
     $user = $userSearch->execOne();
-    if(!$searchValid){
+    if (!$searchValid) {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -83,14 +83,14 @@ $app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $
                 'Reason' => 'User Lookup Invalid'
             ]);
     }
-    if(!$user instanceof User){
+    if (!$user instanceof User) {
         $user = new User();
         $user->email = $email;
         $user->phonenumber = $phonenumber;
         $user->setPassword($password);
         $user->save();
     }
-    if($user->banned == "Yes" || $user->deleted == "Yes"){
+    if ($user->banned == "Yes" || $user->deleted == "Yes") {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -98,7 +98,7 @@ $app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $
                 'Reason' => 'User Banned/Deleted'
             ]);
     }
-    if($user->checkPassword($password)){
+    if ($user->checkPassword($password)) {
         return $response
             ->withStatus(200)
             ->withJson([
@@ -106,7 +106,7 @@ $app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $
                 'User' => $user->__toPublicArray(),
                 'AuthCode' => $user->getNextAuthCode(),
             ]);
-    }else{
+    } else {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -117,17 +117,17 @@ $app->post("/login", function(\Slim\Http\Request $request, \Slim\Http\Response $
 
 });
 
-$app->post('/auth', function(\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
+$app->post('/auth', function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
     $authCode = $request->getParsedBodyParam('authcode');
 
-    if($authCode == $secret){
+    if ($authCode == $secret) {
         return $response
             ->withStatus(200)
             ->withJson([
                 'Status' => 'Okay',
                 'authKey' => str_rot13($authCode),
             ]);
-    }else{
+    } else {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -136,9 +136,9 @@ $app->post('/auth', function(\Slim\Http\Request $request, \Slim\Http\Response $r
     }
 });
 
-$app->put("/profile",  function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
+$app->put("/profile", function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
     $authKey = $request->getParsedBodyParam('authKey');
-    if(!$authKey){
+    if (!$authKey) {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -148,7 +148,7 @@ $app->put("/profile",  function (\Slim\Http\Request $request, \Slim\Http\Respons
     }
 
     $user = User::getByAuthCode($authKey);
-    if(!$user instanceof User){
+    if (!$user instanceof User) {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -157,7 +157,7 @@ $app->put("/profile",  function (\Slim\Http\Request $request, \Slim\Http\Respons
             ]);
     }
 
-    if($request->getParsedBodyParam('phoneNumber')){
+    if ($request->getParsedBodyParam('phoneNumber')) {
         $user->phonenumber = $request->getParsedBodyParam('phoneNumber');
     }
     $user->save();
@@ -174,7 +174,7 @@ $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Respons
     $coordinates = $request->getParsedBodyParam('location');
     $deviceId = $request->getParsedBodyParam('deviceId', '');
 
-    if(!$authKey){
+    if (!$authKey) {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -185,7 +185,7 @@ $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Respons
 
     $user = User::getByAuthCode($authKey);
 
-    if(!$user instanceof User){
+    if (!$user instanceof User) {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -193,7 +193,7 @@ $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Respons
                 'Reason' => 'Invalid authKey. No user match.'
             ]);
     }
-    if(!$coordinates){
+    if (!$coordinates) {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -202,7 +202,7 @@ $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Respons
             ]);
     }
     $coordinates = explode(",", $coordinates);
-    if(!count($coordinates) == 2){
+    if (!count($coordinates) == 2) {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -228,7 +228,7 @@ $app->put('/location', function (\Slim\Http\Request $request, \Slim\Http\Respons
 
 $app->post("/location", function (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) use ($secret) {
     $authKey = $request->getParsedBodyParam('authKey');
-    if(!$authKey){
+    if (!$authKey) {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -236,7 +236,7 @@ $app->post("/location", function (\Slim\Http\Request $request, \Slim\Http\Respon
                 'Reason' => 'No authKey'
             ]);
     }
-    if($authKey != str_rot13($secret)){
+    if ($authKey != str_rot13($secret)) {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -248,14 +248,14 @@ $app->post("/location", function (\Slim\Http\Request $request, \Slim\Http\Respon
         ->where('user_id', 0)
         ->order('created', 'DESC')
         ->execOne();
-    if($location) {
+    if ($location) {
         return $response
             ->withStatus(200)
             ->withJson([
                 'Status' => 'Okay',
                 'Location' => $location->__toPublicArray(),
             ]);
-    }else{
+    } else {
         return $response
             ->withStatus(400)
             ->withJson([
@@ -273,41 +273,38 @@ $app->post('/friends', function (\Slim\Http\Request $request, \Slim\Http\Respons
     $authKey = $request->getParsedBodyParam('authKey');
     $user = User::getByAuthCode($authKey);
     $fakeFriendsEnabled = false;
-    if($user instanceof User) {
+    if ($user instanceof User) {
         $friends = [];
-
-        if($fakeFriendsEnabled) {
+        foreach (User::search()->exec() as $user) {
+            $lastLocation = $user->getLocation();
+            if ($lastLocation instanceof Location) {
+                $friends[] = [
+                    'Name' => ['Firstname' => $user->email, 'Lastname' => ''],
+                    'Location' => [
+                        'Lat' => $lastLocation->lat,
+                        'Long' => $lastLocation->lng,
+                    ]
+                ];
+            }
+        }
+        if ($fakeFriendsEnabled) {
             $friendCount = rand(5, 10);
-
             $locationBoxXMin = 53.569503;
             $locationBoxXMax = 53.392574;
             $locationBoxYMin = -2.418099;
             $locationBoxYMax = -2.064232;
-
-            foreach (User::search()->exec() as $user) {
-                $lastLocation = $user->getLocation();
-                if ($lastLocation instanceof Location) {
-                    $friends[] = [
-                        'Name' => ['Firstname' => $user->email, 'Lastname' => ''],
-                        'Location' => [
-                            'Lat' => $lastLocation->lat,
-                            'Long' => $lastLocation->lng,
-                        ]
-                    ];
-                }
+            for ($i = 0; $i < $friendCount; $i++) {
+                $friend = [
+                    'Name' => ['Firstname' => $faker->firstName, 'Lastname' => $faker->lastName],
+                    'Location' => [
+                        'Lat' => rand($locationBoxXMin * 1000000, $locationBoxXMax * 1000000) / 1000000,
+                        'Long' => rand($locationBoxYMin * 1000000, $locationBoxYMax * 1000000) / 1000000
+                    ]
+                ];
+                $friends[] = $friend;
             }
         }
 
-        for ($i = 0; $i < $friendCount; $i++) {
-            $friend = [
-                'Name' => ['Firstname' => $faker->firstName, 'Lastname' => $faker->lastName],
-                'Location' => [
-                    'Lat' => rand($locationBoxXMin * 1000000, $locationBoxXMax * 1000000) / 1000000,
-                    'Long' => rand($locationBoxYMin * 1000000, $locationBoxYMax * 1000000) / 1000000
-                ]
-            ];
-            $friends[] = $friend;
-        }
 
         return $response
             ->withStatus(200)
@@ -315,7 +312,7 @@ $app->post('/friends', function (\Slim\Http\Request $request, \Slim\Http\Respons
                 'Status' => 'Okay',
                 'Friends' => $friends
             ]);
-    }else{
+    } else {
         return $response
             ->withStatus(400)
             ->withJson([
