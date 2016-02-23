@@ -272,25 +272,29 @@ $app->post('/friends', function (\Slim\Http\Request $request, \Slim\Http\Respons
 
     $authKey = $request->getParsedBodyParam('authKey');
     $user = User::getByAuthCode($authKey);
+    $fakeFriendsEnabled = false;
     if($user instanceof User) {
         $friends = [];
-        $friendCount = rand(5, 10);
 
-        $locationBoxXMin = 53.569503;
-        $locationBoxXMax = 53.392574;
-        $locationBoxYMin = -2.418099;
-        $locationBoxYMax = -2.064232;
+        if($fakeFriendsEnabled) {
+            $friendCount = rand(5, 10);
 
-        foreach(User::search()->exec() as $user){
-            $lastLocation = $user->getLocation();
-            if($lastLocation instanceof Location) {
-                $friends[] = [
-                    'Name' => ['Firstname' => $user->email, 'Lastname' => ''],
-                    'Location' => [
-                        'Lat' => $lastLocation->lat,
-                        'Long' => $lastLocation->lng,
-                    ]
-                ];
+            $locationBoxXMin = 53.569503;
+            $locationBoxXMax = 53.392574;
+            $locationBoxYMin = -2.418099;
+            $locationBoxYMax = -2.064232;
+
+            foreach (User::search()->exec() as $user) {
+                $lastLocation = $user->getLocation();
+                if ($lastLocation instanceof Location) {
+                    $friends[] = [
+                        'Name' => ['Firstname' => $user->email, 'Lastname' => ''],
+                        'Location' => [
+                            'Lat' => $lastLocation->lat,
+                            'Long' => $lastLocation->lng,
+                        ]
+                    ];
+                }
             }
         }
 
